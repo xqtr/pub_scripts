@@ -114,6 +114,7 @@ audacious $stream
 #We Radio 89.4,https://radioservers.xyz/we-894-live
 #Yellow Radio 92.8,http://radio.streamings.gr:8009/stream
 #Yes Patra 91.2,http://5.9.17.142:8024
+#Zeppelin 106.7,https://radiostreaming.ert.gr/ert-zeppelin
 #Zoo Radio 90.8,https://netradio.live24.gr/zoo908thess
 #Αθήνα 98.4,https://athina984.live24.gr/athina984
 #Δίεση 101.3,https://diesi.live24.gr/diesi1013
