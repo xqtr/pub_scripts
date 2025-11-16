@@ -1,0 +1,60 @@
+#
+# Run-time configuration file for dialog
+#
+# Types of values:
+#
+# Number     -  <number>
+# String     -  "string"
+# Boolean    -  <ON|OFF>
+# Attribute  -  (foreground,background,highlight?,underline?,reverse?)
+
+# Set aspect-ration.
+aspect = 0
+# Set separator (for multiple widgets output).
+separate_widget = ""
+# Set tab-length (for textbox tab-conversion).
+tab_len = 2
+# Make tab-traversal for checklist, etc., include the list.
+visit_items = OFF
+# Shadow dialog boxes? This also turns on color.
+use_shadow = ON
+# Turn color support ON or OFF
+use_colors = ON
+screen_color = (BLACK,WHITE,OFF)
+shadow_color = (BLACK,BLACK,ON)
+dialog_color = (CYAN,BLACK,ON)
+title_color = (WHITE,BLUE,ON)
+border_color = (BLUE,BLACK,ON)
+button_active_color = (WHITE,BLUE,ON)
+button_inactive_color = (WHITE,BLACK,OFF)
+button_key_active_color = (YELLOW,BLUE,ON)
+button_key_inactive_color = (WHITE,BLACK,ON)
+button_label_active_color = (WHITE,BLUE,ON)
+button_label_inactive_color = (WHITE,BLACK,OFF)
+inputbox_color = (WHITE,BLACK,ON)
+inputbox_border_color = (CYAN,BLUE,ON)
+searchbox_color = dialog_color
+searchbox_title_color = (WHITE,BLACK,OFF)
+searchbox_border_color = border_color
+position_indicator_color = (WHITE,BLACK,OFF)
+menubox_color = (WHITE,BLACK,OFF)
+menubox_border_color = border_color
+item_color = (WHITE,BLACK,OFF)
+item_selected_color = (WHITE,BLUE,ON)
+tag_color = (WHITE,BLACK,OFF)
+tag_selected_color = button_label_active_color
+tag_key_color = button_key_inactive_color
+tag_key_selected_color = (YELLOW,BLUE,ON)
+check_color = dialog_color
+check_selected_color = button_active_color
+uarrow_color = (CYAN,BLACK,OFF)
+darrow_color = uarrow_color
+itemhelp_color = (CYAN,BLACK,OFF)
+form_active_text_color = (YELLOW,BLUE,ON)
+form_text_color = (WHITE,BLACK,OFF)
+form_item_readonly_color = (WHITE,BLACK,OFF)
+gauge_color = (CYAN,BLACK,ON)
+border2_color = (BLUE,BLACK,OFF)
+inputbox_border2_color = (BLUE,BLACK,OFF)
+searchbox_border2_color = (BLUE,BLACK,OFF)
+menubox_border2_color = (BLUE,BLACK,OFF)
