@@ -1,0 +1,68 @@
+#!/bin/bash
+
+#title           : Alternative CD command
+#description     : A CD command that stores bookmarks and uses aliases for directories
+#author          : XQTR
+#date            : 20240701
+#version         : 1.0
+#usage           : See below
+#notes           : Another Droid BBS // andr01d.zapto.org:9999
+
+# To use it create an alias like this:
+# alias cc=". cdb"
+# Do not use "cd" or "cdb" as the name of the alias or it will crash.
+
+DIR="/home/x"
+BK=$DIR/.dirbk.csv
+
+usage() {
+  echo ""
+  echo "Usage:"
+  echo "$0 -s <name>: Stores current dir. with the given name/alias"
+  echo "$0 -e       : Edit bookmark file"
+  echo "$0 -l       : List bookmark file"
+  echo "$0 -f       : Echo bookmark filename"
+  echo "$0 -p       : Show path of given directory"
+  echo "$0 <dir>    : Changes to the given dir/alias"
+  echo ""
+}
+
+if [ $# -eq 0 ]; then
+  cd
+else
+  if [ $1 == "-s" ]; then
+    if [ $# -eq 2 ]; then
+      echo "$2;$(pwd)" >> $BK
+    else
+      usage
+    fi
+  elif [ $1 == "-l" ]; then
+    less $BK
+  elif [ $1 == "-e" ]; then
+    nano $BK   
+  elif [ $1 == "-f" ]; then
+    echo $BK
+  elif [ $1 == "-p" ]; then
+    echo "$(grep $2 $BK | cut -d';' -f2)"
+  elif [ $1 == "--help" ]; then
+    usage
+  else  
+    cd "$@" >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+      ans="$(grep "$1" $BK | cut -d";" -f1)"
+      if [ ! -z $ans ]; then
+        cd "$(grep $1 $BK | cut -d';' -f2)"
+      else
+        ans=$(cat $BK | fzf)
+        if [ ! -z $ans ]; then
+          cd "$(echo $ans | cut -d';' -f2)"
+        fi
+      fi
+    fi
+  fi
+fi
+
+
+
+
+

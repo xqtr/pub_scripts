@@ -1,0 +1,402 @@
+#!/bin/bash
+
+TRASH_PATH="$HOME/.local/share/Trash"
+
+function shelp() {
+    COMMAND_SIZE=-25s
+    HELP_SIZE=30s
+    printf " cli %${COMMAND_SIZE} %s\n" "${1}" "${2}"
+}
+
+find_alt() { for i;do which "$i" >/dev/null && { echo "$i"; return 0;};done;return 1; }
+dependencies=(fzf tmux speedtest)
+
+export EDITOR=$(find_alt micro nano efte)
+
+help=$(
+    printf ""
+    printf "┌────────────────────────────────────┐\n"
+    printf "│ "
+    printf ""
+    printf "cli - command line tools for Linux "
+    printf ""
+    printf "│\n"
+    printf "└────────────────────────────────────┘\n"
+
+    printf "Meta:\n"
+    shelp "help" "show this help and exit"
+    shelp "version" "display the version and credits"
+    shelp "check" "check dependencies"
+
+    printf "\nInfo:\n"
+    shelp "weather [location]" "get the weather"
+    
+    printf "\nFonts:\n"
+    shelp "weather [location]" "get the weather"
+    shelp "updatefonts" "update the font cache"
+    
+    printf "\nGitHUB:\n"
+    shelp "listrepos" "list all git repositories in disk"
+
+    printf "\nGeneral:\n"
+    shelp "battery" "display remaining battery"
+    shelp "sleep" "put computer to sleep"
+    shelp "lock" "lock computer"
+    shelp "shutdown [minutes]" "shutdown the computer"
+    shelp "restart" "restart the computer"
+    shelp "time" "show the time"
+    shelp "termsize" "show terminal size cols x lines"
+    shelp "keybindings" "show xfce keyboard bindings"
+
+    printf "\nFiles:\n"
+    shelp "biggest-files [path]" "find the biggest files recursively"
+    shelp "biggest-dirs [path]" "find the biggest directories"
+    shelp "dir-size [path]" "find directory size"
+    shelp "count <file> <string>" "count the number of occurences"
+    shelp "monitor <file>" "monitor file for changes"
+
+    printf "\nNetwork:\n"
+    shelp "speedtest" "test your network speed"
+    shelp "local-ip" "retrieve your local ip address"
+    shelp "ports" "list open ports"
+    shelp "hosts" "edit the hosts file"
+    shelp "ipinfo [ip]" "lookup IP with ipinfo.io API"
+    shelp "netscan" "find devices in local net"
+
+    printf "\nMedia:\n"
+    shelp "music" "mocp player with cava visuals"
+
+    printf "\nPerformance:\n"
+    shelp "memory" "find memory used"
+    shelp "disk" "find disk used"
+    shelp "trashsize" "find the trash size"
+    shelp "trashclean" "empty the trash"
+    
+    printf "\nApplications:\n"
+    shelp "inscopyparty" "install CopyParty file server"
+    shelp "copyparty" "run CopyParty file server"
+    shelp "insretrochat" "install Retrochat r0c"
+    shelp "retrochat" "run retrochat r0c"
+
+    printf "\nTerminal:\n"
+    shelp "aliasedit" "edit aliases"
+    shelp "editbashrc" "edit bashrc"
+
+
+    printf "\n")
+        
+
+function presskey() {
+  echo ""
+  echo -e $C10"Press a key to continue..."$CE
+  read -n 1
+}
+    
+function check_dependencies() {
+  missing_dependencies=()
+  for name in ${dependencies[@]}
+  do
+    if [ ! -x "$(command -v $name)" ]; then
+      missing_dependencies+=($name)
+      case $name in
+        fzf) echo "sudo apt install fzf";;
+      esac
+    fi
+  done
+  if [ ! ${#missing_dependencies[@]} -eq 0 ]; then
+    echo "Some programs, are not installed."
+    presskey
+  fi
+}
+
+function opencalculus() {
+  xfce4-terminal --font "ibm plex mono semibold,20" -e 'bash -c "export BROWSER=firefox;export PLAYER=mpv;export EDITOR=micro;/home/x/bin/calculus"' -T "Calculus" #--maximize
+}
+
+function mouseless() {
+  notify-send "Mouseless" "ijkl: move\nsdf:clicks\nq:quit\na/alt/crtl:speed"
+  /home/x/apps/system/xmouseless/xmouseless
+}
+
+function cfg-fstab() { sudo $EDITOR /etc/fstab ;}
+function cfg-group() { sudo $EDITOR /etc/group ;}
+function cfg-hosts() { sudo $EDITOR /etc/hosts ;}
+function cfg-lightdm() { sudo $EDITOR /etc/lightdm/lightdm.conf ;}
+function cfg-nanorc() { $EDITOR ~/.nanorc;}
+function cfg-sudoers() { sudo $EDITOR /etc/sudoers ;}
+function cfg-sourcelist() { sudo $EDITOR /etc/apt/sources.list ;}
+function cfg-tmuxrc() { $EDITOR ~/.tmux.conf ;}
+function cfg-aliases() { $EDITOR ~/.bash_aliases ;}
+function cfg-openbox() { $EDITOR ~/.config/openbox/lubuntu-rc.xml ;}
+function cfg-autostart() { $EDITOR ~/.config/lxsession/Lubuntu/autostart ;}
+function cfg-mame() { $EDITOR ~/.mame/mame.ini ;}
+function cfg-dosbox() { $EDITOR ~/.dosbox/dosbox-0.74-3.conf ;}
+function cfg-conky() { $EDITOR ~/.conkyrc ;}
+
+function ipinfo() {
+    external_ip="$1"
+    result=$(curl --silent https://ipinfo.io/$external_ip)
+    
+    if [[ $result == "Please provide a valid IP address" || -z $result ]]; then
+        printf "Please provide a valid IP address!\n"
+        exit
+    fi
+
+    json_ip=$(echo "$result" | jq -r ".ip")
+    json_hostname=$(echo "$result" | jq -r ".hostname")
+    json_city=$(echo "$result" | jq -r ".city")
+    json_region=$(echo "$result" | jq -r ".region")
+    json_country=$(echo "$result" | jq -r ".country")
+    json_loc=$(echo "$result" | jq -r ".loc")
+    json_org=$(echo "$result" | jq -r ".org")
+    json_postal=$(echo "$result" | jq -r ".postal")
+
+
+    printf "IP-Address: ${YELLOW}${json_ip}\n"
+    printf "Hostname: ${YELLOW}${json_hostname}\n"
+    printf "Network: ${YELLOW}${json_org}\n"
+    printf "City: ${YELLOW}${json_city}, ${json_region}, ${json_country}\n"
+    printf "Postal Code: ${YELLOW}${json_postal}\n"
+    printf "Latitude/Longitude: ${YELLOW}${json_loc}\n"
+}
+
+
+function weather() {
+  curl -s "wttr.in/$1"
+}
+
+function battery() {
+  PERCENTAGE=$(upower -i "$(upower -e | grep battery)" |
+    awk -F: '/percentage/{gsub(/^\s+|[\s%]+$/, "", $2); print $2}')
+    TIME_REMAINING=$(upower -i "$(upower -e | grep battery)" |
+    awk -F: '/time to empty/{gsub(/^\s+|\s+$/, "", $2); print $2}')
+
+    if [[ "$PERCENTAGE" -gt "30" ]]; then
+        PERCENTAGE_COLOR=""
+    elif [[ "$PERCENTAGE" -gt "10" ]]; then
+        PERCENTAGE_COLOR=""
+    else
+        PERCENTAGE_COLOR=""
+    fi
+
+    printf "${PERCENTAGE_COLOR}${PERCENTAGE}%%${PLAIN} (${TIME_REMAINING} left)\n"
+}
+
+
+function power() {
+  if [[ $1 == "sleep" ]]; then
+     systemctl suspend
+
+  elif [[ $1 == "lock" ]]; then
+     xdg-screensaver lock
+
+  elif [[ $1 == "shutdown" ]]; then
+     sudo shutdown -h now
+
+  elif [[ $1 == "restart" ]]; then
+     sudo reboot
+  fi
+}
+
+function bigfile() {
+# Recursively find the biggest files in the given directory
+    if [[ $1 == "" ]]; then
+        commandargs="."
+    else
+        commandargs="$1"
+    fi
+
+    find $commandargs -type f -print0 |
+        xargs -0 du |
+        sort -rn |
+        head -n 10 |
+        cut -f2 |
+        xargs -I{} du -sh {}
+}
+
+function bigdirs(){
+    if [[ $1 == "" ]]; then
+        commandargs="."
+    else
+        commandargs="$1"
+    fi
+
+    find $commandargs -maxdepth 1 -type d -print0 |
+        xargs -0 du --max-depth=1 |
+        sort -rn |
+        head -n 11 |
+        tail -n +2 |
+        cut -f2 |
+        xargs -I{} du -sh {}
+}
+
+#dir size
+function dirsize(){
+    if [[ $1 == "" ]]; then
+        commandargs="."
+        else
+        commandargs="$1"
+    fi
+
+    du -sh $commandargs | cut -f1
+}
+
+#count occurences of string in file <string> <file>
+function count(){
+   grep -c "$1" $2 | tr -d '\n'
+}
+
+function monitorfile(){
+  tail -f $1
+}
+
+function speedtest(){
+  speedtest --simple
+}
+
+function localip(){
+  ifconfig | awk -v RS="\n\n" '{ for (i=1; i<=NF; i++) if ($i == "inet" && $(i+1) != "127.0.0.1" ) printf "%s\t%s\n", $1, $(i+1) }'
+}
+
+function openports(){
+  sudo lsof -iTCP -sTCP:LISTEN -P
+}
+
+function edithosts() {
+  sudo $EDITOR /etc/hosts
+}
+
+function listrepos() {
+  for line in $(locate .git | grep /.git$); do cd "$line"; cat config | grep url | cut -d "=" -f2;  done;
+}
+  
+function meminfo() {
+  AVAILABLE=$(cat /proc/meminfo | grep MemAvailable | awk '{printf "%d", $2}')
+    TOTAL=$(cat /proc/meminfo | grep MemTotal | awk '{printf "%d", $2}')
+    USED=$(expr $TOTAL - $AVAILABLE)
+    USED_GB=$(echo $USED | awk '{printf "%.1fG", $1/1048576}')
+
+    printf "${USED_GB} / "
+    cat /proc/meminfo | grep MemTotal | awk '{printf "%.1fG", $2/1048576}'
+    printf " used\n"
+}
+
+function diskusage() {
+  df -H | grep 'da' | awk  '{ printf "%s - %s / %s used\n", $1, $3, $2 }'
+}
+
+function trashsize() {
+ if [[ -d ${TRASH_PATH} ]]; then
+   printf "Trash size: %s\n" $(du -hs ${TRASH_PATH} | cut -f1)
+ else
+   printf "Error: Unable to find trash size. Check if ${TRASH_PATH} exists.\n"
+ fi 
+  
+}
+
+function trashclean() {
+    if [[ -d ${TRASH_PATH} ]]; then
+        rm -rf ${TRASH_PATH}/*
+    else
+        printf "Error: Unable to empty trash. Check if ${TRASH_PATH} exists.\n"
+    fi
+}
+
+function musicplayer() {
+  tmux new-session 'cava' \; split-window -v -p 70 'mocp -T black_orange'
+}
+
+function clam() {
+  clamscan -i -r $*
+}
+
+function clamexcl() {
+  clamscan -i -r -exclude='\.(zip|ZIP)'$ $*
+}
+
+function font-refresh() { fc-cache -f -v; }
+function font-list() { fc-list; }
+
+function ffind() {
+  find . -iname "*$@*"
+}
+
+function qr() { 
+  qrencode -lM -m2 -tutf8 "$*"
+}
+
+function termsize() {
+  echo "$(tput cols)x$(tput lines)"
+}
+
+function netscan() {
+  sudo arp-scan -l
+}
+
+########################## main script ##############################
+
+#check_dependencies
+
+if [[ $1 == "help" || -z $1 ]]; then
+    printf "${help}" | fzf
+    exit 1
+fi
+
+cmd=$1
+shift 1
+args="$@"
+
+
+case $cmd in
+  "music") musicplayer;; 
+  "trashsize") trashsize;;
+  "trashclean") trashclean;;
+  "diskusage") diskusage;;
+  "memory") meminfo;;
+  "check") check_dependencies;;
+  "weather") weather $args;;
+  "battery") battery;;
+  "bigdirs") bigdirs $args;;
+  "bigfiles") bigfile $args;;
+  "count") count $args;;
+  "dirsize") dirsize $args;;
+  "diskusage") diskusage;;
+  "edithosts") edithosts;;
+  "ipinfo") ipinfo;;
+  "localip") localip;;
+  "monitorfile") monitorfile $args;;
+  "ports") openports;;
+  "power") power $args;;
+  "speedtest") speedtest;;
+  "editfstab") cfg-fstab;;
+  "editgroup") cfg-group;;
+  "editlightdm") cfg-lightdm;;
+  "editnanorc") cfg-nanorc;;
+  "editsudoers") cfg-sudoers;;
+  "editsources") cfg-sourcelist;;
+  "edittmux") cfg-tmuxrc;;
+  "editaliases") cfg-aliases;;
+  "editopenbox") cfg-openbox;;
+  "editbashrc") $EDITOR ~/.bashrc;;
+  "editautostart") cfg-autostart;;
+  "editmame") cfg-mame;;
+  "editdosbox") cfg-dosbox;;
+  "editconky") cfg-conky;;
+  "scan") clam $args;;
+  "scan-excl") clamexcl $args;;
+  "font-refresh") font-refresh;;
+  "font-list") font-list;;
+  "find-partial") ffind $args;;
+  "qr") qr $args;;
+  "termsize") termsize;;
+  "netscan") netscan;;
+  "listrepos") listrepos;;
+  "keybindings") $EDITOR /home/x/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml;;
+  "calculus") opencalculus;;
+  "mouseless") mouseless;;
+  "inscopyparty") echo "Installing CopyParty...";python3 -m pip install --user -U copyparty;;
+  "copyparty") copyparty;;
+  "insretrochat") echo "Installing Retrochat...";python3 -m pip install --user -U r0c;;
+  "retrochat") r0c;;
+  "updatefonts") fc-cache -f -v;;
+esac
